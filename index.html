@@ -31,6 +31,12 @@
   .view.active{display:block;}
   @keyframes fade{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
 
+  /* ===== 解锁页 ===== */
+  .lock-box{max-width:320px;margin:0 auto;display:flex;flex-direction:column;gap:14px;align-items:center;}
+  .code-input{width:100%;padding:15px 18px;font-size:20px;letter-spacing:10px;text-align:center;border:1.5px solid var(--line);border-radius:16px;font-family:inherit;background:#fff;color:var(--text);outline:none;}
+  .code-input:focus{border-color:var(--primary);}
+  .lock-error{color:#b5654a;font-size:13px;min-height:18px;}
+
   /* ===== 首页 ===== */
   .hero{text-align:center;padding:36px 12px 10px;}
   .hero .emoji-row{font-size:34px;letter-spacing:8px;margin-bottom:18px;}
@@ -96,8 +102,23 @@
 <body>
 <div class="wrap">
 
+  <!-- ===== 视图：解锁页 ===== -->
+  <section id="view-lock" class="view active">
+    <div class="hero">
+      <div class="emoji-row">🔒</div>
+      <h1>输入<span>验证码</span>开始测试</h1>
+      <p>购买后请在客服处获取 4 位验证码，输入后即可开始测试，验证码不要有空格。</p>
+      <div class="lock-box">
+        <input id="codeInput" class="code-input" type="text" inputmode="numeric" maxlength="4" placeholder="4 位验证码" autocomplete="off" onkeydown="if(event.key==='Enter')verifyCode()">
+        <p class="lock-error" id="codeError"></p>
+        <button class="btn" onclick="verifyCode()">进入测试</button>
+      </div>
+    </div>
+    <p class="disclaimer">本测试为娱乐性质，结果仅供参考，不构成心理或专业建议。</p>
+  </section>
+
   <!-- ===== 视图：首页 ===== -->
-  <section id="view-home" class="view active">
+  <section id="view-home" class="view">
     <div class="hero">
       <div class="emoji-row">🐱🐨🐹🐧</div>
       <h1>谈起恋爱，你是<span>哪种动物</span>？</h1>
@@ -454,6 +475,28 @@ function showView(id){
   document.getElementById(id).classList.add("active");
   window.scrollTo({top:0,behavior:"smooth"});
 }
+
+/* ===== 验证码白名单（纯前端，可循环复用） ===== */
+const ACCESS_CODES = ["4729"];
+
+function verifyCode(){
+  const v = document.getElementById("codeInput").value.trim();
+  const err = document.getElementById("codeError");
+  if(ACCESS_CODES.includes(v)){
+    try{ localStorage.setItem("love_test_unlocked","1"); }catch(e){}
+    err.textContent = "";
+    showView("view-home");
+  }else{
+    err.textContent = "验证码不正确，请核对后再输入";
+  }
+}
+
+/* 初始化：本机已解锁则直接进首页 */
+(function(){
+  let unlocked = false;
+  try{ unlocked = localStorage.getItem("love_test_unlocked")==="1"; }catch(e){}
+  if(unlocked){ showView("view-home"); }
+})();
 
 /* 首页动物预告 */
 (function(){
