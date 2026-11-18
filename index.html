@@ -483,7 +483,6 @@ function verifyCode(){
   const v = document.getElementById("codeInput").value.trim();
   const err = document.getElementById("codeError");
   if(ACCESS_CODES.includes(v)){
-    try{ localStorage.setItem("love_test_unlocked","1"); }catch(e){}
     err.textContent = "";
     showView("view-home");
   }else{
@@ -491,12 +490,7 @@ function verifyCode(){
   }
 }
 
-/* 初始化：本机已解锁则直接进首页 */
-(function(){
-  let unlocked = false;
-  try{ unlocked = localStorage.getItem("love_test_unlocked")==="1"; }catch(e){}
-  if(unlocked){ showView("view-home"); }
-})();
+/* 初始化：每次打开都停在验证码页，不记忆解锁状态 */
 
 /* 首页动物预告 */
 (function(){
